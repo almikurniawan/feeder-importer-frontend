@@ -16,7 +16,7 @@ export default function Home(props) {
     const router = useRouter();
 
     const importFromOasis = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/import', {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilaiTransfer/import', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,14 +24,14 @@ export default function Home(props) {
             },
             body: JSON.stringify({
                 jurusan: selectedJurusan,
-                tahun: selectedTahun,
+                tahun: selectedTahunAngkatan,
                 catatan: textCatatan
             })
         });
         const res = await result.json();
         setBussy(false);
         if (res.status) {
-            router.push('/nilai/history/' + res.data.id);
+            router.push('/nilai_trf/history/' + res.data.id);
         } else {
             if (res.message == 'Unauthorized access') {
                 localStorage.removeItem('token');

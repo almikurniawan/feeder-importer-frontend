@@ -7,16 +7,19 @@ import { ClipLoader } from 'react-spinners';
 import { blue } from '@mui/material/colors';
 import { DataGrid } from '@mui/x-data-grid';
 import MenuIcon from '@mui/icons-material/Menu';
-
+        
 const columns = [
     { field: 'nim', headerName: 'NIM', width: 70 },
-    { field: 'nama', headerName: 'Nama', width: 130 },
-    { field: 'kode_mk', headerName: 'Kode MK', width: 100 },
-    { field: 'nama_mk', headerName: 'Nama MK', width: 130 },
-    { field: 'nama_kelas', headerName: 'Nama Kelas', width: 130 },
-    { field: 'nilai_huruf', headerName: 'Nilai Huruf', width: 70 },
-    { field: 'nilai_indek', headerName: 'Nilai Indek', width: 70 },
-    { field: 'nilai_angka', headerName: 'Nilai Angka', width: 70 },
+    { field: 'kode_matkul_asal', headerName: 'Kode Matkul Asal', width: 70 },
+    { field: 'nama_mata_kuliah_asal', headerName: 'Nama Matkul Asal', width: 130 },
+    { field: 'sks_mata_kuliah_asal', headerName: 'SKS Matkul Asal', width: 70 },
+    { field: 'nilai_huruf_asal', headerName: 'Nilai Huruf Asal', width: 70 },
+    { field: 'kode_matkul_diakui', headerName: 'Kode Matkul Diakui', width: 70 },
+    { field: 'nama_matkul_diakui', headerName: 'Nama Matkul Diakui', width: 130 },
+    { field: 'sks_mata_kuliah_diakui', headerName: 'SKS Matkul Diakui', width: 70 },
+    { field: 'nilai_angka_diakui', headerName: 'Nilai Angka Diakui', width: 70 },
+    { field: 'nilai_huruf_diakui', headerName: 'Nilai Huruf Diakui', width: 70 },
+    { field: 'nama_pt_asal', headerName: 'PT Asal', width: 150 },
     {
         field: 'status_error', headerName: 'Status', width: 150, renderCell: (params) => {
             return (
@@ -53,8 +56,8 @@ export default function Home() {
     const [proses, setProses] = useState(0);
     const [totalProses, setTotalProses] = useState(0);
     const [filter, setFilter] = useState([]);
-    const [openModalNamaKelas, setOpenModalNamaKelas] = useState(false);
-    const [namaKelas, setNamaKelas] = useState('');
+    const [openModalPt, setOpenModalPt] = useState(false);
+    const [namaPT, setNamaPT] = useState('');
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -77,7 +80,7 @@ export default function Home() {
     }, [page, filter]);
 
     const getData = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/nilai/' + id + '?page=' + (page + 1), {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilaiTransfer/nilai/' + id + '?page=' + (page + 1), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -90,7 +93,7 @@ export default function Home() {
         const res = await result.json();
         setBussy(false);
         if (res.status) {
-            setData(res.data.nilai);
+            setData(res.data.rows);
             setTotalData(res.data.pager.total);
         } else {
             if (res.message == 'Unauthorized access') {
@@ -104,7 +107,7 @@ export default function Home() {
 
     const pushNeoFeeder = async (data) => {
         setBussy(true);
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/push/' + id, {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilaiTransfer/push/' + id, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -125,21 +128,21 @@ export default function Home() {
     }
 
     const getProgress = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/progress/' + id, {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilaiTransfer/progress/' + id, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
         });
         const res = await result.json();
-        if (res.data.nil_head_eksekusi_total == null) {
+        if (res.data.trf_head_eksekusi_total == null) {
             setTimeout(() => {
                 getProgress();
             }, 10000);
         } else {
-            setProses(res.data.nil_head_eksekusi);
-            setTotalProses(res.data.nil_head_eksekusi_total);
-            if (parseInt(res.data.nil_head_eksekusi) < parseInt(res.data.nil_head_eksekusi_total)) {
+            setProses(res.data.trf_head_eksekusi);
+            setTotalProses(res.data.trf_head_eksekusi_total);
+            if (parseInt(res.data.trf_head_eksekusi) < parseInt(res.data.trf_head_eksekusi_total)) {
                 setTimeout(() => {
                     getProgress();
                 }, 10000);
@@ -151,8 +154,8 @@ export default function Home() {
         }
     }
 
-    const saveNamaKelas = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/updateNama/' + id + '?page=' + page, {
+    const savePT = async () => {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilaiTransfer/updateNama/' + id + '?page=' + page, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -160,13 +163,13 @@ export default function Home() {
             },
             body: JSON.stringify({
                 'id': rowSelected,
-                'nama_kelas': namaKelas
+                'nama_pt': namaPT
             })
         });
 
         const res = await result.json();
         if (res.status) {
-            setOpenModalNamaKelas(false);
+            setOpenModalPt(false);
             getData();
         } else {
             if (res.message == 'Unauthorized access') {
@@ -180,7 +183,7 @@ export default function Home() {
 
     const deleteData = async () => {
         setBussyDelete(true);
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/delete', {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilaiTransfer/delete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -208,11 +211,11 @@ export default function Home() {
     return (
         <Box sx={{ display: 'flex' }}>
             <Modal
-                    open={openModalNamaKelas}
+                    open={openModalPt}
                 >
                     <Box sx={style}>
                         <Typography id="modal-modal-title" variant="h6" component="h2">
-                            Edit Nama Kelas
+                            Edit PT Asal
                         </Typography>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                             <Box
@@ -226,13 +229,13 @@ export default function Home() {
                             >
                                 <Grid container spacing={2}>
                                     <Grid item md={12}>
-                                    <TextField style={{ width: '100%' }} label="Nama Kelas" variant="outlined" value={namaKelas}
-                                            onChange={(e) => setNamaKelas(e.target.value)} />
+                                    <TextField style={{ width: '100%' }} label="Kode PT" variant="outlined" value={namaPT}
+                                            onChange={(e) => setNamaPT(e.target.value)} />
                                     </Grid>
                                     <Grid item md={12}>
                                         <Button variant="contained"
                                             onClick={() => {
-                                                saveNamaKelas();
+                                                savePT();
                                             }}
                                         > Simpan</Button>
                                     </Grid>
@@ -249,7 +252,7 @@ export default function Home() {
                 <Card variant="outlined">
                     <CardContent>
                         <Typography variant="h5" gutterBottom align='left'>
-                            List Nilai Perkuliahan
+                            List Nilai Transfer
                         </Typography>
                         <Button variant="contained"
                             disabled={isBussy}
@@ -304,8 +307,8 @@ export default function Home() {
                                 }}
                             >
                                 <MenuItem id='menu-1' onClick={(e) => {
-                                    setOpenModalNamaKelas(true);
-                                }}>Nama Kelas</MenuItem>
+                                    setOpenModalPt(true);
+                                }}>Perguruan Tinggi Asal</MenuItem>
                             </Menu>
                         </div>
                         {

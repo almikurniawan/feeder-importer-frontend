@@ -9,19 +9,22 @@ import { useRouter } from 'next/router';
 
 const columns = [
   { field: 'nim', headerName: 'NIM', width: 70 },
-  { field: 'nama', headerName: 'Nama', width: 130 },
-  { field: 'kode_mk', headerName: 'Kode MK', width: 100 },
-  { field: 'nama_mk', headerName: 'Nama MK', width: 130 },
-  { field: 'nama_kelas', headerName: 'Nama Kelas', width: 130 },
-  { field: 'nilai_huruf', headerName: 'Nilai Huruf', width: 70 },
-  { field: 'nilai_indek', headerName: 'Nilai Indek', width: 70 },
-  { field: 'nilai_angka', headerName: 'Nilai Angka', width: 70 },
+  { field: 'kode_matkul_asal', headerName: 'Kode Matkul Asal', width: 70 },
+  { field: 'nama_mata_kuliah_asal', headerName: 'Nama Matkul Asal', width: 130 },
+  { field: 'sks_mata_kuliah_asal', headerName: 'SKS Matkul Asal', width: 70 },
+  { field: 'nilai_huruf_asal', headerName: 'Nilai Huruf Asal', width: 70 },
+  { field: 'kode_matkul_diakui', headerName: 'Kode Matkul Diakui', width: 70 },
+  { field: 'nama_matkul_diakui', headerName: 'Nama Matkul Diakui', width: 130 },
+  { field: 'sks_mata_kuliah_diakui', headerName: 'SKS Matkul Diakui', width: 70 },
+  { field: 'nilai_angka_diakui', headerName: 'Nilai Angka Diakui', width: 70 },
+  { field: 'nilai_huruf_diakui', headerName: 'Nilai Huruf Diakui', width: 70 },
+  { field: 'nama_pt_asal', headerName: 'PT Asal', width: 150 },
   {
     field: 'status_error', headerName: 'Status', width: 150, renderCell: (params) => {
       return (
         <div>
           {
-            (params.row.status_error == 0) ? <Chip label="Belum Dieksekusi" variant="filled" /> : (params.row.status_error == 1) ? <Chip label="Sukses" variant="outlined" color='success' /> : <div><Chip label="Error" variant="outlined" color='error' /> <br/>{params.row.keterangan}</div>
+            (params.row.status_error == 0) ? <Chip label="Belum Dieksekusi" variant="filled" /> : (params.row.status_error == 1) ? <Chip label="Sukses" variant="outlined" color='success' /> : <div><Chip label="Error" variant="outlined" color='error' /> <br /> {params.row.keterangan}</div>
           }
         </div>
       )
@@ -44,8 +47,8 @@ export default function Home(props) {
     getData();
   }, [page, filter]);
 
-  const getData = async () =>{
-    const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai?page=' + (page+1), {
+  const getData = async () => {
+    const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilaiTransfer?page=' + (page + 1), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,13 +61,13 @@ export default function Home(props) {
 
     const res = await result.json();
     if (res.status) {
-      setData(res.data.nilai);
+      setData(res.data.rows);
       setTotalData(res.data.pager.total);
     } else {
-      if(res.message=='Unauthorized access'){
+      if (res.message == 'Unauthorized access') {
         localStorage.removeItem('token');
         router.push('/login');
-      }else{
+      } else {
         alert('Terjadi Kesalahan ' + res.message);
       }
     }
