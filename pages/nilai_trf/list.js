@@ -1,7 +1,7 @@
 import { CardContent, Chip } from '@mui/material';
 import { Button, Grid, Box, Toolbar, Typography, CssBaseline, Container, Card, Paper } from '@mui/material';
-import Header from '../components/header';
-import MenuFeeder from '../components/menu';
+import Header from '../../components/header';
+import MenuFeeder from '../../components/menu';
 import { DataGrid } from '@mui/x-data-grid';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -80,11 +80,11 @@ export default function Home(props) {
         <Card variant="outlined">
           <CardContent>
             <Typography variant="h5" gutterBottom align='left'>
-              Nilai Perkuliahan
+              Nilai Transfer
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <Link href="/nilai/import">
+                <Link href="/nilai_trf/import">
                   <Button style={{
                     marginTop: '10px',
                     marginBottom: '10px',
@@ -92,7 +92,7 @@ export default function Home(props) {
                 </Link>
               </Grid>
               <Grid item xs={6}>
-                <Link href="/nilai/history/list">
+                <Link href="/nilai_trf/history/list">
                   <Button
                     color='secondary'
                     style={{

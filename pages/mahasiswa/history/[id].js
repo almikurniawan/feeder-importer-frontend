@@ -573,8 +573,8 @@ export default function Home(props) {
                                 <DataGrid
                                     rows={data}
                                     columns={columns}
-                                    pageSize={20}
-                                    rowsPerPageOptions={[20]}
+                                    pageSize={100}
+                                    rowsPerPageOptions={[100]}
                                     rowCount={totalData}
                                     page={page}
                                     checkboxSelection

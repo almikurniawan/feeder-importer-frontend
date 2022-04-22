@@ -18,7 +18,7 @@ export default function Home(props) {
     const router = useRouter();
 
     const importFromOasis = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/import', {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/krs/import', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ export default function Home(props) {
         const res = await result.json();
         setBussy(false);
         if (res.status) {
-            router.push('/nilai/history/' + res.data.id);
+            router.push('/krs/history/' + res.data.id);
         } else {
             if (res.message == 'Unauthorized access') {
                 localStorage.removeItem('token');
@@ -56,7 +56,7 @@ export default function Home(props) {
                 <Card variant="outlined">
                     <CardContent>
                         <Typography variant="h5" gutterBottom align='left'>
-                            Import Nilai Perkuliahan
+                            Import KRS Perkuliahan
                         </Typography>
                         <Box
                             component="form"

@@ -1,5 +1,4 @@
-import { CardContent, Grid, Icon, LinearProgress, Menu, Modal } from '@mui/material';
-import { Box, Toolbar, Typography, CssBaseline, FormControl, TextField, Card, Chip, InputLabel, Select, MenuItem, Button } from '@mui/material';
+import { Box, Toolbar, Typography, CssBaseline, FormControl, TextField, Card, Chip, InputLabel, Select, MenuItem, Button , CardContent, Grid, Icon, LinearProgress, Menu, Modal} from '@mui/material';
 import Header from '../../../components/header';
 import MenuFeeder from '../../../components/menu';
 import { useRouter } from 'next/router';
@@ -11,6 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { set } from 'date-fns';
 
 const columns = [
     { field: 'semester', headerName: 'Semester', width: 70 },
@@ -97,6 +97,8 @@ export default function Home() {
     const [lingkup, setLingkup] = useState(0);
     const [openModalMode, setOpenModalMode] = useState(false);
     const [mode, setMode] = useState('');
+    const [openModalNamaKelas, setOpenModalNamaKelas] = useState(false);
+    const [namaKelas, setNamaKelas] = useState('');
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -137,6 +139,33 @@ export default function Home() {
         } else {
             if (res.message == 'Unauthorized access') {
                 console.log('Unauthorized access');
+                localStorage.removeItem('token');
+                router.push('/login');
+            } else {
+                alert('Terjadi Kesalahan ' + res.message);
+            }
+        }
+    }
+
+    const saveNamaKelas = async () => {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateNama/' + id + '?page=' + page, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                'id': rowSelected,
+                'nama_kelas': namaKelas
+            })
+        });
+
+        const res = await result.json();
+        if (res.status) {
+            setOpenModalNamaKelas(false);
+            getData();
+        } else {
+            if (res.message == 'Unauthorized access') {
                 localStorage.removeItem('token');
                 router.push('/login');
             } else {
@@ -332,6 +361,41 @@ export default function Home() {
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Box sx={{ display: 'flex' }}>
+            <Modal
+                    open={openModalNamaKelas}
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Edit Nama Kelas
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            <Box
+                                component="form"
+                                noValidate
+                                autoComplete="off"
+                                sx={{
+                                    width: 500,
+                                    maxWidth: '100%',
+                                }}
+                            >
+                                <Grid container spacing={2}>
+                                    <Grid item md={12}>
+                                    <TextField style={{ width: '100%' }} label="Nama Kelas" variant="outlined" value={namaKelas}
+                                            onChange={(e) => setNamaKelas(e.target.value)} />
+                                    </Grid>
+                                    <Grid item md={12}>
+                                        <Button variant="contained"
+                                            onClick={() => {
+                                                saveNamaKelas();
+                                            }}
+                                        > Simpan</Button>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Typography>
+                    </Box>
+                </Modal>
+
                 <Modal
                     open={openModalTanggal}
                 >
@@ -588,6 +652,9 @@ export default function Home() {
                                     }}
                                 >
                                     <MenuItem id='menu-1' onClick={(e) => {
+                                        setOpenModalNamaKelas(true);
+                                    }}>Nama Kelas</MenuItem>
+                                    <MenuItem id='menu-1' onClick={(e) => {
                                         setOpenModalTanggal(true);
                                     }}>Tanggal Mulai & Selesai</MenuItem>
                                     <MenuItem id='menu-2' onClick={(e) => {
@@ -620,8 +687,8 @@ export default function Home() {
                                 <DataGrid
                                     rows={data}
                                     columns={columns}
-                                    pageSize={20}
-                                    rowsPerPageOptions={[20]}
+                                    pageSize={100}
+                                    rowsPerPageOptions={[100]}
                                     rowCount={totalData}
                                     page={page}
                                     checkboxSelection

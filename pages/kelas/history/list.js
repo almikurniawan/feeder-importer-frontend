@@ -95,8 +95,8 @@ export default function Home() {
                                 getRowId={(row) => row.kelas_head_id}
                                 rows={data}
                                 columns={columns}
-                                pageSize={20}
-                                rowsPerPageOptions={[20]}
+                                pageSize={100}
+                                rowsPerPageOptions={[100]}
                                 rowCount={totalData}
                                 page={page}
                                 paginationMode="server"

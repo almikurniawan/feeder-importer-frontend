@@ -13,17 +13,17 @@ const columns = [
     { field: 'jur_nama', headerName: 'Jurusan', width: 150 },
     { field: 'tahun_label', headerName: 'Thn. Ajaran', width: 100 },
     { field: 'sms_nama', headerName: 'Sms. Ajaran', width: 150 },
-    { field: 'nil_head_catatan', headerName: 'Catatan', width: 130 },
-    { field: 'nil_head_total', headerName: 'Jumlah Record', width: 130 },
+    { field: 'krs_head_catatan', headerName: 'Catatan', width: 130 },
+    { field: 'krs_head_total', headerName: 'Jumlah Record', width: 130 },
     { field: 'user_fullname', headerName: 'Oleh', width: 150, renderCell: (params) => {
         return (
-            <>{params.row.user_fullname} <br/>pada : {params.row.nil_head_created_at}</>
+            <>{params.row.user_fullname} <br/>pada : {params.row.krs_head_created_at}</>
         );
     }},
     {
         field: 'status_error', headerName: 'Action', width: 150, renderCell: (params) => {
             return (
-                <Link href={"/nilai/history/"+params.row.nil_head_id}>
+                <Link href={"/krs/history/"+params.row.krs_head_id}>
                   <Button style={{
                     marginTop: '10px',
                     marginBottom: '10px',
@@ -51,7 +51,7 @@ export default function Home() {
     }, [page, filter]);
 
     const getData = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/history?page=' + (page+1),{
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/krs/history?page=' + (page+1),{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export default function Home() {
         });
         const res = await result.json();
         if (res.status) {
-            setData(res.data.nilai);
+            setData(res.data.rows);
             setTotalData(res.data.pager.total);
         } else {
             if (res.message == 'Unauthorized access') {
@@ -86,11 +86,11 @@ export default function Home() {
                 <Card variant="outlined">
                     <CardContent>
                         <Typography variant="h5" gutterBottom align='left'>
-                            List History Import Nilai
+                            List History Import KRS
                         </Typography>
                         <div style={{ height: '100vh', width: '100%', marginTop: '15px' }}>
                             <DataGrid
-                                getRowId={(row) => row.nil_head_id}
+                                getRowId={(row) => row.krs_head_id}
                                 rows={data}
                                 columns={columns}
                                 pageSize={100}

@@ -22,6 +22,11 @@ const MenuFeeder = () => {
             icon: <HomeOutlinedIcon />,
         },
         {
+            name: 'KRS',
+            url: '/krs/list',
+            icon: <HomeOutlinedIcon />,
+        },
+        {
             name: 'Nilai Perkuliahan',
             url: '/',
             icon: <MenuBookOutlinedIcon />,
@@ -30,7 +35,18 @@ const MenuFeeder = () => {
             name: 'Biodata Mahasiswa',
             url: '/mahasiswa/list',
             icon: <PersonOutlineOutlinedIcon />,
-        }
+        },
+        {
+            name: 'AKM',
+            url: '/akm/list',
+            icon: <PersonOutlineOutlinedIcon />,
+        },
+        {
+            name: 'Nilai Transfer',
+            url: '/nilai_trf/list',
+            icon: <PersonOutlineOutlinedIcon />,
+        },
+        
     ];
     return (
         <Drawer

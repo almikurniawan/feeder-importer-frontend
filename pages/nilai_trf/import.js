@@ -10,9 +10,7 @@ import { blue } from '@mui/material/colors';
 export default function Home(props) {
     const [isBussy, setBussy] = useState(false);
     const [selectedJurusan, setSelectedJurusan] = useState(0);
-    const [selectedTahun, setSelectedTahun] = useState(0);
     const [selectedTahunAngkatan, setSelectedTahunAngkatan] = useState(0);
-    const [selectedSemester, setSelectedSemester] = useState(0);
     const [textCatatan, setTextCatatan] = useState('');
 
     const router = useRouter();
@@ -27,8 +25,6 @@ export default function Home(props) {
             body: JSON.stringify({
                 jurusan: selectedJurusan,
                 tahun: selectedTahun,
-                tahunAngkatan : selectedTahunAngkatan,
-                semester: selectedSemester,
                 catatan: textCatatan
             })
         });
@@ -97,42 +93,6 @@ export default function Home(props) {
                                         props.tahun.map((item, index) => {
                                             return (
                                                 <MenuItem value={item.tahun_id} key={index}>{item.tahun_label}</MenuItem>
-                                            )
-                                        })
-                                    }
-                                </Select>
-                            </FormControl>
-                            <FormControl>
-                                <InputLabel id="label-tahun">Tahun Ajaran</InputLabel>
-                                <Select
-                                    labelId='label-tahun'
-                                    id="label-tahun"
-                                    value={selectedTahun}
-                                    label="Tahun Ajaran"
-                                    onChange={(e) => setSelectedTahun(e.target.value)}
-                                >
-                                    {
-                                        props.tahun.map((item, index) => {
-                                            return (
-                                                <MenuItem value={item.tahun_id} key={index}>{item.tahun_label}</MenuItem>
-                                            )
-                                        })
-                                    }
-                                </Select>
-                            </FormControl>
-                            <FormControl>
-                                <InputLabel id="label-semester">Semester Ajaran</InputLabel>
-                                <Select
-                                    labelId='label-semester'
-                                    id="label-semester"
-                                    value={selectedSemester}
-                                    label="Semester Ajaran"
-                                    onChange={(e) => setSelectedSemester(e.target.value)}
-                                >
-                                    {
-                                        props.semester.map((item, index) => {
-                                            return (
-                                                <MenuItem value={item.sms_id} key={index}>{item.sms_nama}</MenuItem>
                                             )
                                         })
                                     }

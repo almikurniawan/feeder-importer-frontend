@@ -50,6 +50,7 @@ export default function Home(props) {
         const res = await result.json();
         if (res.status) {
             localStorage.setItem('token', res.token);
+            localStorage.setItem('fullname', res.fullname);
             router.push('/');
         } else {
             alert(res.message);

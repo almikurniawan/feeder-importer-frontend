@@ -10,13 +10,14 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 const columns = [
     { field: 'nim', headerName: 'NIM', width: 70 },
-    { field: 'nama', headerName: 'Nama', width: 130 },
-    { field: 'kode_mk', headerName: 'Kode MK', width: 100 },
-    { field: 'nama_mk', headerName: 'Nama MK', width: 130 },
-    { field: 'nama_kelas', headerName: 'Nama Kelas', width: 130 },
-    { field: 'nilai_huruf', headerName: 'Nilai Huruf', width: 70 },
-    { field: 'nilai_indek', headerName: 'Nilai Indek', width: 70 },
-    { field: 'nilai_angka', headerName: 'Nilai Angka', width: 70 },
+    { field: 'nama', headerName: 'Nama', width: 230 },
+    { field: 'semester', headerName: 'Semester', width: 100 },
+    { field: 'ips', headerName: 'IPS', width: 100 },
+    { field: 'ipk', headerName: 'IPK', width: 100 },
+    { field: 'sks_smt', headerName: 'SKS', width: 100 },
+    { field: 'sks_total', headerName: 'SKS Total', width: 100 },
+    { field: 'status_kuliah', headerName: 'Status Kuliah', width: 100 },
+    { field: 'biaya_smt', headerName: 'UKT', width: 100 },
     {
         field: 'status_error', headerName: 'Status', width: 150, renderCell: (params) => {
             return (
@@ -53,8 +54,14 @@ export default function Home() {
     const [proses, setProses] = useState(0);
     const [totalProses, setTotalProses] = useState(0);
     const [filter, setFilter] = useState([]);
-    const [openModalNamaKelas, setOpenModalNamaKelas] = useState(false);
-    const [namaKelas, setNamaKelas] = useState('');
+    const [openModalIpk, setOpenModalIpk] = useState(false);
+    const [openModalSks, setOpenModalSks] = useState(false);
+    const [openModalStatus, setOpenModalStatus] = useState(false);
+    const [openModalUkt, setOpenModalUkt] = useState(false);
+    const [ipk, setIpk] = useState(0);
+    const [sks, setSks] = useState(0);
+    const [status, setStatus] = useState(0);
+    const [ukt, setUkt] = useState(0);
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -77,7 +84,7 @@ export default function Home() {
     }, [page, filter]);
 
     const getData = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/nilai/' + id + '?page=' + (page + 1), {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/akm/akm/' + id + '?page=' + (page + 1), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -90,7 +97,7 @@ export default function Home() {
         const res = await result.json();
         setBussy(false);
         if (res.status) {
-            setData(res.data.nilai);
+            setData(res.data.rows);
             setTotalData(res.data.pager.total);
         } else {
             if (res.message == 'Unauthorized access') {
@@ -104,7 +111,7 @@ export default function Home() {
 
     const pushNeoFeeder = async (data) => {
         setBussy(true);
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/push/' + id, {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/akm/push/' + id, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -125,21 +132,22 @@ export default function Home() {
     }
 
     const getProgress = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/progress/' + id, {
+        setBussy(true);
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/akm/progress/' + id, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
         });
         const res = await result.json();
-        if (res.data.nil_head_eksekusi_total == null) {
+        if (res.data.akm_head_eksekusi_total == null) {
             setTimeout(() => {
                 getProgress();
             }, 10000);
         } else {
-            setProses(res.data.nil_head_eksekusi);
-            setTotalProses(res.data.nil_head_eksekusi_total);
-            if (parseInt(res.data.nil_head_eksekusi) < parseInt(res.data.nil_head_eksekusi_total)) {
+            setProses(res.data.akm_head_eksekusi);
+            setTotalProses(res.data.akm_head_eksekusi_total);
+            if (parseInt(res.data.akm_head_eksekusi) < parseInt(res.data.akm_head_eksekusi_total)) {
                 setTimeout(() => {
                     getProgress();
                 }, 10000);
@@ -151,8 +159,8 @@ export default function Home() {
         }
     }
 
-    const saveNamaKelas = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/updateNama/' + id + '?page=' + page, {
+    const saveIpk = async () => {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/akm/updateIpk/' + id + '?page=' + page, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -160,13 +168,94 @@ export default function Home() {
             },
             body: JSON.stringify({
                 'id': rowSelected,
-                'nama_kelas': namaKelas
+                'ipk': ipk
             })
         });
 
         const res = await result.json();
         if (res.status) {
-            setOpenModalNamaKelas(false);
+            setOpenModalIpk(false);
+            getData();
+        } else {
+            if (res.message == 'Unauthorized access') {
+                localStorage.removeItem('token');
+                router.push('/login');
+            } else {
+                alert('Terjadi Kesalahan ' + res.message);
+            }
+        }
+    }
+
+    const saveSks = async () => {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/akm/updateSks/' + id + '?page=' + page, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                'id': rowSelected,
+                'sks': sks
+            })
+        });
+
+        const res = await result.json();
+        if (res.status) {
+            setOpenModalSks(false);
+            getData();
+        } else {
+            if (res.message == 'Unauthorized access') {
+                localStorage.removeItem('token');
+                router.push('/login');
+            } else {
+                alert('Terjadi Kesalahan ' + res.message);
+            }
+        }
+    }
+
+    const saveStatus = async () => {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/akm/updateStatus/' + id + '?page=' + page, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                'id': rowSelected,
+                'status': status
+            })
+        });
+
+        const res = await result.json();
+        if (res.status) {
+            setOpenModalStatus(false);
+            getData();
+        } else {
+            if (res.message == 'Unauthorized access') {
+                localStorage.removeItem('token');
+                router.push('/login');
+            } else {
+                alert('Terjadi Kesalahan ' + res.message);
+            }
+        }
+    }
+
+    const saveUkt = async () => {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/akm/updateUkt/' + id + '?page=' + page, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                'id': rowSelected,
+                'ukt': ukt
+            })
+        });
+
+        const res = await result.json();
+        if (res.status) {
+            setOpenModalUkt(false);
             getData();
         } else {
             if (res.message == 'Unauthorized access') {
@@ -180,7 +269,7 @@ export default function Home() {
 
     const deleteData = async () => {
         setBussyDelete(true);
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/delete', {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/akm/delete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -208,11 +297,11 @@ export default function Home() {
     return (
         <Box sx={{ display: 'flex' }}>
             <Modal
-                    open={openModalNamaKelas}
+                    open={openModalIpk}
                 >
                     <Box sx={style}>
                         <Typography id="modal-modal-title" variant="h6" component="h2">
-                            Edit Nama Kelas
+                            Edit IPK
                         </Typography>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                             <Box
@@ -226,13 +315,115 @@ export default function Home() {
                             >
                                 <Grid container spacing={2}>
                                     <Grid item md={12}>
-                                    <TextField style={{ width: '100%' }} label="Nama Kelas" variant="outlined" value={namaKelas}
-                                            onChange={(e) => setNamaKelas(e.target.value)} />
+                                    <TextField style={{ width: '100%' }} label="IPK" variant="outlined" value={ipk}
+                                            onChange={(e) => setIpk(e.target.value)} />
                                     </Grid>
                                     <Grid item md={12}>
                                         <Button variant="contained"
                                             onClick={() => {
-                                                saveNamaKelas();
+                                                saveIpk();
+                                            }}
+                                        > Simpan</Button>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Typography>
+                    </Box>
+                </Modal>
+                <Modal
+                    open={openModalSks}
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Edit SKS
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            <Box
+                                component="form"
+                                noValidate
+                                autoComplete="off"
+                                sx={{
+                                    width: 500,
+                                    maxWidth: '100%',
+                                }}
+                            >
+                                <Grid container spacing={2}>
+                                    <Grid item md={12}>
+                                    <TextField style={{ width: '100%' }} label="SKS" variant="outlined" value={sks}
+                                            onChange={(e) => setSks(e.target.value)} />
+                                    </Grid>
+                                    <Grid item md={12}>
+                                        <Button variant="contained"
+                                            onClick={() => {
+                                                saveSks();
+                                            }}
+                                        > Simpan</Button>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Typography>
+                    </Box>
+                </Modal>
+                <Modal
+                    open={openModalStatus}
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Edit Status
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            <Box
+                                component="form"
+                                noValidate
+                                autoComplete="off"
+                                sx={{
+                                    width: 500,
+                                    maxWidth: '100%',
+                                }}
+                            >
+                                <Grid container spacing={2}>
+                                    <Grid item md={12}>
+                                    <TextField style={{ width: '100%' }} label="Status" variant="outlined" value={status}
+                                            onChange={(e) => setStatus(e.target.value)} />
+                                    </Grid>
+                                    <Grid item md={12}>
+                                        <Button variant="contained"
+                                            onClick={() => {
+                                                saveStatus();
+                                            }}
+                                        > Simpan</Button>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Typography>
+                    </Box>
+                </Modal>
+                <Modal
+                    open={openModalUkt}
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Edit UKT
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            <Box
+                                component="form"
+                                noValidate
+                                autoComplete="off"
+                                sx={{
+                                    width: 500,
+                                    maxWidth: '100%',
+                                }}
+                            >
+                                <Grid container spacing={2}>
+                                    <Grid item md={12}>
+                                    <TextField style={{ width: '100%' }} label="UKT" variant="outlined" value={ukt}
+                                            onChange={(e) => setUkt(e.target.value)} />
+                                    </Grid>
+                                    <Grid item md={12}>
+                                        <Button variant="contained"
+                                            onClick={() => {
+                                                saveUkt();
                                             }}
                                         > Simpan</Button>
                                     </Grid>
@@ -249,7 +440,7 @@ export default function Home() {
                 <Card variant="outlined">
                     <CardContent>
                         <Typography variant="h5" gutterBottom align='left'>
-                            List Nilai Perkuliahan
+                            List AKM
                         </Typography>
                         <Button variant="contained"
                             disabled={isBussy}
@@ -304,8 +495,17 @@ export default function Home() {
                                 }}
                             >
                                 <MenuItem id='menu-1' onClick={(e) => {
-                                    setOpenModalNamaKelas(true);
-                                }}>Nama Kelas</MenuItem>
+                                    setOpenModalIpk(true);
+                                }}>IPK</MenuItem>
+                                <MenuItem id='menu-1' onClick={(e) => {
+                                    setOpenModalSks(true);
+                                }}>SKS Total</MenuItem>
+                                <MenuItem id='menu-1' onClick={(e) => {
+                                    setOpenModalStatus(true);
+                                }}>Status Kuliah</MenuItem>
+                                <MenuItem id='menu-1' onClick={(e) => {
+                                    setOpenModalUkt(true);
+                                }}>UKT</MenuItem>
                             </Menu>
                         </div>
                         {

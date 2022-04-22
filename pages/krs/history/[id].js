@@ -10,13 +10,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 const columns = [
     { field: 'nim', headerName: 'NIM', width: 70 },
-    { field: 'nama', headerName: 'Nama', width: 130 },
+    { field: 'nama', headerName: 'Nama', width: 230 },
     { field: 'kode_mk', headerName: 'Kode MK', width: 100 },
     { field: 'nama_mk', headerName: 'Nama MK', width: 130 },
     { field: 'nama_kelas', headerName: 'Nama Kelas', width: 130 },
-    { field: 'nilai_huruf', headerName: 'Nilai Huruf', width: 70 },
-    { field: 'nilai_indek', headerName: 'Nilai Indek', width: 70 },
-    { field: 'nilai_angka', headerName: 'Nilai Angka', width: 70 },
     {
         field: 'status_error', headerName: 'Status', width: 150, renderCell: (params) => {
             return (
@@ -77,7 +74,7 @@ export default function Home() {
     }, [page, filter]);
 
     const getData = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/nilai/' + id + '?page=' + (page + 1), {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/krs/krs/' + id + '?page=' + (page + 1), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -90,7 +87,7 @@ export default function Home() {
         const res = await result.json();
         setBussy(false);
         if (res.status) {
-            setData(res.data.nilai);
+            setData(res.data.rows);
             setTotalData(res.data.pager.total);
         } else {
             if (res.message == 'Unauthorized access') {
@@ -104,7 +101,7 @@ export default function Home() {
 
     const pushNeoFeeder = async (data) => {
         setBussy(true);
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/push/' + id, {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/krs/push/' + id, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -125,21 +122,23 @@ export default function Home() {
     }
 
     const getProgress = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/progress/' + id, {
+        setBussy(true);
+        console.log(isBussy);
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/krs/progress/' + id, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
         });
         const res = await result.json();
-        if (res.data.nil_head_eksekusi_total == null) {
+        if (res.data.krs_head_eksekusi_total == null) {
             setTimeout(() => {
                 getProgress();
             }, 10000);
         } else {
-            setProses(res.data.nil_head_eksekusi);
-            setTotalProses(res.data.nil_head_eksekusi_total);
-            if (parseInt(res.data.nil_head_eksekusi) < parseInt(res.data.nil_head_eksekusi_total)) {
+            setProses(res.data.krs_head_eksekusi);
+            setTotalProses(res.data.krs_head_eksekusi_total);
+            if (parseInt(res.data.krs_head_eksekusi) < parseInt(res.data.krs_head_eksekusi_total)) {
                 setTimeout(() => {
                     getProgress();
                 }, 10000);
@@ -152,7 +151,7 @@ export default function Home() {
     }
 
     const saveNamaKelas = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/updateNama/' + id + '?page=' + page, {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/krs/updateNama/' + id + '?page=' + page, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -180,7 +179,7 @@ export default function Home() {
 
     const deleteData = async () => {
         setBussyDelete(true);
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/delete', {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/krs/delete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -249,7 +248,7 @@ export default function Home() {
                 <Card variant="outlined">
                     <CardContent>
                         <Typography variant="h5" gutterBottom align='left'>
-                            List Nilai Perkuliahan
+                            List KRS
                         </Typography>
                         <Button variant="contained"
                             disabled={isBussy}
