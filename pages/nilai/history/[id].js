@@ -13,6 +13,7 @@ const columns = [
     { field: 'nama', headerName: 'Nama', width: 130 },
     { field: 'kode_mk', headerName: 'Kode MK', width: 100 },
     { field: 'nama_mk', headerName: 'Nama MK', width: 130 },
+    { field: 'sks', headerName: 'SKS', width: 100 },
     { field: 'nama_kelas', headerName: 'Nama Kelas', width: 130 },
     { field: 'nilai_huruf', headerName: 'Nilai Huruf', width: 70 },
     { field: 'nilai_indek', headerName: 'Nilai Indek', width: 70 },
@@ -55,6 +56,8 @@ export default function Home() {
     const [filter, setFilter] = useState([]);
     const [openModalNamaKelas, setOpenModalNamaKelas] = useState(false);
     const [namaKelas, setNamaKelas] = useState('');
+    const [openModalKodeMatkul, setOpenModalKodeMatkul] = useState(false);
+    const [kodeMatkul, setKodeMatkul] = useState('');
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -151,6 +154,32 @@ export default function Home() {
         }
     }
 
+    const saveKodeMatkul = async () => {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/updateKode/' + id, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                'id': rowSelected,
+                'kode_matkul': kodeMatkul,
+            })
+        });
+        const res = await result.json();
+        if (res.status) {
+            setOpenModalKodeMatkul(false);
+            getData();
+        } else {
+            if (res.message == 'Unauthorized access') {
+                localStorage.removeItem('token');
+                router.push('/login');
+            } else {
+                alert('Terjadi Kesalahan ' + res.message);
+            }
+        }
+    }
+
     const saveNamaKelas = async () => {
         const result = await fetch('http://192.168.0.35/feeder-backend/public/api/nilai/updateNama/' + id + '?page=' + page, {
             method: 'POST',
@@ -208,39 +237,82 @@ export default function Home() {
     return (
         <Box sx={{ display: 'flex' }}>
             <Modal
-                    open={openModalNamaKelas}
-                >
-                    <Box sx={style}>
-                        <Typography id="modal-modal-title" variant="h6" component="h2">
-                            Edit Nama Kelas
-                        </Typography>
-                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            <Box
-                                component="form"
-                                noValidate
-                                autoComplete="off"
-                                sx={{
-                                    width: 500,
-                                    maxWidth: '100%',
-                                }}
-                            >
-                                <Grid container spacing={2}>
-                                    <Grid item md={12}>
-                                    <TextField style={{ width: '100%' }} label="Nama Kelas" variant="outlined" value={namaKelas}
-                                            onChange={(e) => setNamaKelas(e.target.value)} />
-                                    </Grid>
-                                    <Grid item md={12}>
-                                        <Button variant="contained"
-                                            onClick={() => {
-                                                saveNamaKelas();
-                                            }}
-                                        > Simpan</Button>
-                                    </Grid>
+                open={openModalKodeMatkul}
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Edit Kode Matkul
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        <Box
+                            component="form"
+                            noValidate
+                            autoComplete="off"
+                            sx={{
+                                width: 500,
+                                maxWidth: '100%',
+                            }}
+                        >
+                            <Grid container spacing={2}>
+                                <Grid item md={12}>
+                                    <TextField id="kode_matkul" label="Kode Matkul" variant="outlined" fullWidth value={kodeMatkul} onChange={(e) => setKodeMatkul(e.target.value)} />
                                 </Grid>
-                            </Box>
-                        </Typography>
-                    </Box>
-                </Modal>
+                                <Grid item md={12}>
+                                    <Button variant="contained"
+                                        onClick={() => {
+                                            saveKodeMatkul();
+                                        }}
+                                    > Simpan</Button>
+                                    <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                        onClick={() => {
+                                            setOpenModalKodeMatkul(false);
+                                        }}
+                                    > Close</Button>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Typography>
+                </Box>
+            </Modal>
+            <Modal
+                open={openModalNamaKelas}
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Edit Nama Kelas
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        <Box
+                            component="form"
+                            noValidate
+                            autoComplete="off"
+                            sx={{
+                                width: 500,
+                                maxWidth: '100%',
+                            }}
+                        >
+                            <Grid container spacing={2}>
+                                <Grid item md={12}>
+                                    <TextField style={{ width: '100%' }} label="Nama Kelas" variant="outlined" value={namaKelas}
+                                        onChange={(e) => setNamaKelas(e.target.value)} />
+                                </Grid>
+                                <Grid item md={12}>
+                                    <Button variant="contained"
+                                        onClick={() => {
+                                            saveNamaKelas();
+                                        }}
+                                    > Simpan</Button>
+                                    <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                        onClick={() => {
+                                            setOpenModalNamaKelas(false);
+                                        }}
+                                    > Close</Button>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Typography>
+                </Box>
+            </Modal>
             <CssBaseline />
             <Header />
             <MenuFeeder />
@@ -303,6 +375,9 @@ export default function Home() {
                                     horizontal: 'left',
                                 }}
                             >
+                                <MenuItem id='menu-1' onClick={(e) => {
+                                    setOpenModalKodeMatkul(true);
+                                }}>Kode Matkul</MenuItem>
                                 <MenuItem id='menu-1' onClick={(e) => {
                                     setOpenModalNamaKelas(true);
                                 }}>Nama Kelas</MenuItem>

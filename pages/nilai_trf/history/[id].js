@@ -238,6 +238,11 @@ export default function Home() {
                                                 savePT();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setOpenModalPt(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>

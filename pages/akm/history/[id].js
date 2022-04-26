@@ -324,6 +324,11 @@ export default function Home() {
                                                 saveIpk();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setOpenModalIpk(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -358,6 +363,11 @@ export default function Home() {
                                                 saveSks();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setOpenModalSks(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -392,6 +402,11 @@ export default function Home() {
                                                 saveStatus();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setOpenModalStatus(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -426,6 +441,11 @@ export default function Home() {
                                                 saveUkt();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setOpenModalUkt(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>

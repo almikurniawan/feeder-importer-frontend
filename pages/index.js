@@ -12,6 +12,7 @@ const columns = [
   { field: 'nama', headerName: 'Nama', width: 130 },
   { field: 'kode_mk', headerName: 'Kode MK', width: 100 },
   { field: 'nama_mk', headerName: 'Nama MK', width: 130 },
+  { field: 'sks', headerName: 'SKS', width: 100 },
   { field: 'nama_kelas', headerName: 'Nama Kelas', width: 130 },
   { field: 'nilai_huruf', headerName: 'Nilai Huruf', width: 70 },
   { field: 'nilai_indek', headerName: 'Nilai Indek', width: 70 },

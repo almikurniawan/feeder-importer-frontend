@@ -16,6 +16,7 @@ const columns = [
     { field: 'semester', headerName: 'Semester', width: 70 },
     { field: 'kode_mk', headerName: 'Kode MK', width: 100 },
     { field: 'nama_mk', headerName: 'Nama MK', width: 130 },
+    { field: 'sks', headerName: 'SKS', width: 100 },
     { field: 'nama_kelas', headerName: 'Nama Kelas', width: 130 },
     { field: 'tgl_mulai_koas', headerName: 'Tgl Mulai', width: 100 },
     { field: 'tgl_selesai_koas', headerName: 'Tgl Selesai', width: 100 },
@@ -99,6 +100,8 @@ export default function Home() {
     const [mode, setMode] = useState('');
     const [openModalNamaKelas, setOpenModalNamaKelas] = useState(false);
     const [namaKelas, setNamaKelas] = useState('');
+    const [openModalKodeMatkul, setOpenModalKodeMatkul] = useState(false);
+    const [kodeMatkul, setKodeMatkul] = useState('');
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -148,7 +151,7 @@ export default function Home() {
     }
 
     const saveNamaKelas = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateNama/' + id + '?page=' + page, {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateNama/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -175,7 +178,7 @@ export default function Home() {
     }
 
     const saveTanggal = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateTanggal/' + id + '?page=' + page, {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateTanggal/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -203,7 +206,7 @@ export default function Home() {
     }
 
     const saveBahasan = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateBahasan/' + id + '?page=' + page, {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateBahasan/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -230,7 +233,7 @@ export default function Home() {
     }
 
     const saveLingkup = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateLingkup/' + id + '?page=' + page, {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateLingkup/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -257,7 +260,7 @@ export default function Home() {
     }
 
     const saveMode = async () => {
-        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateMode/' + id + '?page=' + page, {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateMode/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -271,6 +274,32 @@ export default function Home() {
         const res = await result.json();
         if (res.status) {
             setOpenModalMode(false);
+            getData();
+        } else {
+            if (res.message == 'Unauthorized access') {
+                localStorage.removeItem('token');
+                router.push('/login');
+            } else {
+                alert('Terjadi Kesalahan ' + res.message);
+            }
+        }
+    }
+
+    const saveKodeMatkul = async () => {
+        const result = await fetch('http://192.168.0.35/feeder-backend/public/api/kelas/updateKode/' + id , {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                'id': rowSelected,
+                'kode_matkul': kodeMatkul,
+            })
+        });
+        const res = await result.json();
+        if (res.status) {
+            setOpenModalKodeMatkul(false);
             getData();
         } else {
             if (res.message == 'Unauthorized access') {
@@ -362,6 +391,44 @@ export default function Home() {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Box sx={{ display: 'flex' }}>
             <Modal
+                open={openModalKodeMatkul}
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Edit Kode Matkul
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        <Box
+                            component="form"
+                            noValidate
+                            autoComplete="off"
+                            sx={{
+                                width: 500,
+                                maxWidth: '100%',
+                            }}
+                        >
+                            <Grid container spacing={2}>
+                                <Grid item md={12}>
+                                    <TextField id="kode_matkul" label="Kode Matkul" variant="outlined" fullWidth value={kodeMatkul} onChange={(e) => setKodeMatkul(e.target.value)} />
+                                </Grid>
+                                <Grid item md={12}>
+                                    <Button variant="contained"
+                                        onClick={() => {
+                                            saveKodeMatkul();
+                                        }}
+                                    > Simpan</Button>
+                                    <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                        onClick={() => {
+                                            setOpenModalKodeMatkul(false);
+                                        }}
+                                    > Close</Button>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Typography>
+                </Box>
+            </Modal>
+            <Modal
                     open={openModalNamaKelas}
                 >
                     <Box sx={style}>
@@ -389,6 +456,11 @@ export default function Home() {
                                                 saveNamaKelas();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setOpenModalNamaKelas(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -442,6 +514,11 @@ export default function Home() {
                                                 saveTanggal();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setOpenModalTanggal(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -478,6 +555,11 @@ export default function Home() {
                                                 saveBahasan();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setOpenModalBahasan(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -530,6 +612,11 @@ export default function Home() {
                                                 saveLingkup();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setOpenModalLingkup(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -582,6 +669,11 @@ export default function Home() {
                                                 saveMode();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setOpenModalMode(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -651,6 +743,9 @@ export default function Home() {
                                         horizontal: 'left',
                                     }}
                                 >
+                                    <MenuItem id='menu-1' onClick={(e) => {
+                                        setOpenModalKodeMatkul(true);
+                                    }}>Kode Matkul</MenuItem>
                                     <MenuItem id='menu-1' onClick={(e) => {
                                         setOpenModalNamaKelas(true);
                                     }}>Nama Kelas</MenuItem>

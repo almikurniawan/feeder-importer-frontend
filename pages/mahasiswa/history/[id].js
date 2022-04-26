@@ -384,6 +384,11 @@ export default function Home(props) {
                                                 savePembiayaan();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setModalPembiayaan(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -437,6 +442,11 @@ export default function Home(props) {
                                                 saveJalurMasuk();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setModalJalurMasuk(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -474,6 +484,11 @@ export default function Home(props) {
                                                 saveBiaya();
                                             }}
                                         > Simpan</Button>
+                                        <Button variant="contained" color='warning' style={{marginLeft : '10px'}}
+                                            onClick={() => {
+                                                setModalBiaya(false);
+                                            }}
+                                        > Close</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
